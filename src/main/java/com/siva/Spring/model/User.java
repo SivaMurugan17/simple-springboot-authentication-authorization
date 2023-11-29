@@ -4,8 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Data;
 
 @Entity
+@Data
 public class User {
     String username;
     String password;
@@ -13,4 +15,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     int id;
+
+    public User(String username,String password){
+        this.username = username;
+        this.password = password;
+    }
+
+    public User(Integer id, String username, String password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+    }
 }

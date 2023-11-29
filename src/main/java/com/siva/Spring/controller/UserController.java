@@ -9,18 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 public class UserController {
 
     @Autowired
     private UserService userService;
-    @GetMapping
+    @GetMapping("/users")
     public List<User> getAllUsers(){
         return userService.getAllUsers();
     }
 
-    @PostMapping
-    public User addUser(@PathVariable User user){
+    @PostMapping("/users")
+    public User addUser(@RequestBody User user){
         return userService.addUser(user);
     }
 }
