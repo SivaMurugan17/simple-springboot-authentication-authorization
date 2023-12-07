@@ -26,4 +26,8 @@ public class UserService {
     public User addUser(User user){
         return userRepository.save(user);
     }
+
+    public User findUserByName(String name){
+        return userRepository.findByUsername(name).orElse(null);
+    }
 }

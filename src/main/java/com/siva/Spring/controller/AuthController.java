@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,14 +36,17 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     @PostMapping("/signin")
     public ResponseEntity authenticateUser(@RequestBody LoginRequest loginRequest){
+        log.info("Reached here"+loginRequest);
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
-        log.info("Reached here");
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         ResponseCookie cookie = jwtUtils.generateJwtCookie(userDetails);
-        return  ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,cookie.toString()).body(new User(userDetails.getId(),userDetails.getUsername(),userDetails.getPassword()));
+        return  ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,cookie.toString()).body(new User(userDetails.getId(),userDetails.getUsername(),encoder.encode(userDetails.getPassword())));
     }
 
     @PostMapping("/signup")

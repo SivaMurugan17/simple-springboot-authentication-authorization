@@ -1,8 +1,10 @@
 package com.siva.Spring.config;
 
+import com.siva.Spring.jwt.AuthEntryPointJwt;
 import com.siva.Spring.jwt.AuthTokenFilter;
 import com.siva.Spring.jwt.UserDetailsImpl;
 import com.siva.Spring.jwt.UserDetailsServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,16 +27,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 //@EnableWebSecurity
 @EnableMethodSecurity
+@Slf4j
 public class WebSecurityConfig {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
-//        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
 
@@ -45,9 +52,11 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(csrf -> csrf.disable());
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests((requests) ->
                 //allows only the permit all page, else throws 403
-                requests.requestMatchers("/api/hello").permitAll()
+                requests.requestMatchers("/api/hello/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
