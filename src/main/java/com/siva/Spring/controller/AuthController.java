@@ -51,7 +51,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity registerUser(@RequestBody SignupRequest signupRequest){
-        User user = userService.addUser(new User(signupRequest.getUsername(),signupRequest.getPassword()));
+        User user = userService.addUser(new User(signupRequest.getUsername(),encoder.encode(signupRequest.getPassword())));
         return ResponseEntity.ok().body(user);
     }
 

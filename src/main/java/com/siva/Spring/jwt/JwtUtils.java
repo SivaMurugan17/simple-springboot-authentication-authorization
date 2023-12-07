@@ -16,7 +16,7 @@ public class JwtUtils {
 
     int jwtExpirationMs = 24*60*60;
 
-    String jwtSecret = "siva";
+    String jwtSecret = "======================BezKoder=Spring===========================";
 
     String jwtCookieName = "AuthCookie";
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal){
